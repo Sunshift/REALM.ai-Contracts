@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.20;
+
+
+import {ModelResultNFT} from "./model_NFT.sol";
+import {ModelEvaluation} from "./validate.sol";
+
+
+contract Validation {
+bool private ModelEvaluation;
+
+
+modifier checkCondition() {
+require(ModelEvaluation, "Condition not met");
+_;
+}
+
+
+function setCondition(bool _value) external {
+ModelEvaluation = _value;
+}
+
+
+function getCondition() external view returns(bool) {
+return ModelEvaluation;
+}
+}
+
+
+contract Minting {
+address private minting;
+Validation validation;
+
+
+constructor(address _minting) {
+minting = _minting;
+validation = Validation(_minting);
+}
+
+
+function performActionIfConditionMet() external {
+require(validation.getCondition() == true, "Condition not met in Validation contract");
+// proceed with the action
+}
+}
