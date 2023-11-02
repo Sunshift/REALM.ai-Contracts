@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.20;
+
+
+import "./validate.sol"; // Import the original contract
+
+
+contract ModelUpdater {
+    ModelEvaluation private modelEvaluation; // Instance of the original contract
+
+
+    constructor(address _modelEvaluationAddress) {
+        modelEvaluation = ModelEvaluation(_modelEvaluationAddress);
+    }
+
+
+    function updateModel(
+        uint256 modelId,
+        uint256 version,
+        uint256 accuracy,
+        uint256 recall,
+        uint256 f1Score,
+        string memory metadata
+    ) public {
+        // Check if the new model's scores are higher than the current thresholds
+        require(
+            accuracy > modelEvaluation.accuracyThreshold() &&
+            recall > modelEvaluation.recallThreshold() &&
+            f1Score > modelEvaluation.f1ScoreThreshold(),
+            "New model's scores are not higher than the current thresholds"
+        );
+
+
+        // If the scores are higher, update the model
+        modelEvaluation.addModelResult(modelId, version, accuracy, recall, f1Score, metadata);
+    }
+}
