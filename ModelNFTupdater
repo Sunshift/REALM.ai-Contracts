@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.20;
+
+
+import {ModelUpdater} from "./revalidate.sol"; // Import the revalidate contract
+import {ModelResultNFT} from "./model_NFT.sol"; // Import the NFT_Model contract
+
+
+contract ModelResultNFTUpdater is ModelUpdater {
+    ModelResultNFT private modelResultNFT; // Instance of the NFT_Model contract
+
+
+    constructor(address _modelEvaluationAddress, address _modelResultNFTAddress) 
+        ModelUpdater(_modelEvaluationAddress) {
+        modelResultNFT = ModelResultNFT(_modelResultNFTAddress);
+    }
+
+
+    function getCurrentTokenId() public view returns (uint256) {
+        require(_tokenIds.current() > 0, "No tokens have been minted yet");
+        return _tokenIds.current();
+    }
+
+
+    function updateModelResultNFT(
+        uint256 modelId,
+        uint256 version,
+        uint256 accuracy,
+        uint256 recall,
+        uint256 f1Score,
+        string memory metadata,
+        string memory description
+    ) public {
+        // Call the updateModel function from the ModelUpdater contract
+        updateModel(modelId, version, accuracy, recall, f1Score, metadata);
+
+
+        // Get the current tokenId for the model
+        uint256 tokenId = modelResultNFT.getCurrentTokenId();
+
+
+        // Update the corresponding NFT in the ModelResultNFT contract
+        modelResultNFT.updateModelResult(tokenId, accuracy, recall, f1Score, metadata, description);
+    }
+}
